@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 readme = "README.md"
-name = "combidate"
+name = "combidata"
 description = "Package for random data generation, combination and data prepare for tests"
 keywords = [
     "QA",
@@ -14,7 +14,7 @@ keywords = [
     "testing",
     "autotesting"
 ]
-urls = {Homepage = "https://github.com/Warrfie/combidate"}
+urls = {Homepage = "https://github.com/Warrfie/combidata"}
 authors = [{name = "MaximKuklikov(Warrfie)", email = "warrfie@gmail.com"}]
 requires-python = ">=3.10"
-version="0.1.1"
+version="0.1.0"

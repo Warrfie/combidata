@@ -7,10 +7,10 @@ long_description = (here / "README.md").read_text(encoding="utf-8")
 
 setup(
     name="combidata",
-    version="0.1.1",
+    version="0.1.0",
     description="Package for random data generation and combination different cases",
     long_description=long_description,
-    url="https://github.com/Warrfie/combidate",
+    url="https://github.com/Warrfie/combidata",
     author="Kuklikov Maxim (Warrfie)",
     author_email="warrfie@gmail.com",
     classifiers=[
@@ -25,7 +25,7 @@ setup(
     python_requires=">=3.10, <4",
     project_urls={
         "Telegram": "https://t.me/sasisochka",
-        "Main page": "https://github.com/Warrfie/combidate"
+        "Main page": "https://github.com/Warrfie/combidata"
     },
 )
 
