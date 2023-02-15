@@ -15,8 +15,10 @@ class DataGenerator:
         self.init_lib = {}
         for field_name, field in library["cases"].items():
             self.init_lib[field_name] = {}
-            for mode_name, mode in field.items():
-                self.init_lib[field_name].update({mode_name: Case(mode, field_name, mode_name)})
+            for field_mode, case in field.items():
+                self.init_lib[field_name].update({field_mode: Case(case, field_name, field_mode)})
+                if possible_modes is not None and field_name in possible_modes.keys() and field_mode not in possible_modes[field_name]:
+                    self.init_lib[field_name][field_mode].type_of_case = "OFF"
 
         if possible_fields is not None or banned_fields is not None:
             banned_fields = banned_fields if possible_fields is None else [field for field in self.init_lib.keys() if field not in possible_fields]
@@ -40,16 +42,12 @@ class DataGenerator:
         if type_of_cases is None:
             for field_name, cases in self.init_lib.items():
                 for field_mode, case in cases.items():
-                    if possible_modes is not None and field_name in possible_modes.keys() and field_mode not in possible_modes[field_name]:
-                        case.type_of_case = "OFF"
                     if case.type_of_case is None:
                         assert case.case_name not in self.combinations.keys(), case.case_name + " - is not unique"
                         self.combinations.update({case.case_name: Combination(case, self.workflow, self.init_lib, self.form_lib, self.tools)})
         else:
             for field_name, cases in self.init_lib.items():
                 for field_mode, case in cases.items():
-                    if possible_modes is not None and field_name in possible_modes.keys() and field_mode not in possible_modes[field_name]:
-                        case.type_of_case = "OFF"
                     if case.type_of_case == type_of_cases:
                         assert case.case_name not in self.combinations.keys(), case.case_name + " - is not unique"
                         self.combinations.update({case.case_name: Combination(case, self.workflow, self.init_lib, self.form_lib, self.tools, type_of_cases)})
