@@ -1,21 +1,39 @@
 import copy
 import random
 
+
 def check_join(main, rule):
+    if rule is None:
+        return False
+
     for field, mode in rule.items():
         if field in main.keys():
-            if mode != main[field]:
+            if len(mode.intersection(main[field])) == 0:
                 return False
     return True
 
-def form_requirements(init_lib, rule):#todo add [] list choise
+
+def form_requirements(init_lib, rule):
     exp = copy.deepcopy(rule)
-    for field, mode in rule.items():
-        if init_lib[field][mode].requirements is not None:
-            new_rule = form_requirements(init_lib, init_lib[field][mode].requirements)
-            if check_join(exp, new_rule):
-                exp.update(new_rule)
+    for field, mode_set in rule.items():
+        mode_list = list(mode_set)
+        while len(mode_list) > 0:
+            mode = random.choice(mode_list)
+            del mode_list[mode_list.index(mode)]  # TODO beautify
+
+            if init_lib[field][mode].requirements is not None:
+                new_rule = form_requirements(init_lib, init_lib[field][mode].requirements)
+                if check_join(exp, new_rule):
+                    exp.update(new_rule)
+                    break
+                elif len(mode_list) == 0:
+                    return None
+            else:
+                exp.update({field: {mode}})
+                break
+
     return exp
+
 
 def combine(combination):
     combination.test_seed = {combination.main_case.field_name: combination.main_case.field_mode}
@@ -29,7 +47,6 @@ def combine(combination):
                     combination.other_cases.update({name: combination.init_lib[name][mode]})
                     combination.test_seed.update({name: mode})
                     del all_fields[all_fields.index(name)]
-
 
     del all_fields[all_fields.index(combination.main_case.field_name)]
 
@@ -54,7 +71,7 @@ def combine(combination):
                 break
             del field_modes[field_modes.index(example_mode)]
 
-        assert field_mode is not None, "Не удалось подобрать кейс!"
+        assert field_mode is not None, "Can't combine!"
 
         combination.other_cases.update({field_name: cases[field_mode]})
         combination.test_seed.update({field_name: field_mode})
