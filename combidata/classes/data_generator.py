@@ -55,8 +55,8 @@ class DataGenerator:
         if amount is not None: # TODO for next realises — upgrade that algorithm
             if amount >= len(self.combinations.keys()):
                 return # TODO for next realises — make additional cases
-            for _ in amount:
-                del self.combinations[random.choice([self.combinations.keys()])]
+            for _ in range(amount):
+                del self.combinations[random.choice(list(self.combinations.keys()))]
 
 
     def run(self):

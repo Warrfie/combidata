@@ -35,7 +35,6 @@ def generate_value(all_fields, case, combination: Combination):
 
 def generate(combination: Combination):
     all_fields = list(combination.other_cases.values())
-
     generate_value(all_fields, combination.main_case, combination)
 
     while len(all_fields) > 0:

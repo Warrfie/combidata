@@ -16,9 +16,14 @@ class Case:
     options = None
 
     def __init__(self, case: dict, field_name, field_mode):
+
+        self.additional_fields = copy.deepcopy(case)  # TODO make normal warehouse
+
         self.field_name = field_name
         self.field_mode = field_mode
         self.case_name = case["name"]
+
+
 
         self.value = None if "value" not in case.keys() else case["value"]
 
@@ -35,7 +40,9 @@ class Case:
 
         self.options = None if "options" not in case.keys() else case["options"]
 
-        self.additional_fields = copy.deepcopy(case)  # TODO make normal warehouse
+
+
+
 
     def hand_requirements(self, requirements):
         if isinstance(requirements, dict):
