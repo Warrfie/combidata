@@ -1,6 +1,12 @@
 class Process:
+    """
+    Holds test step (process)
 
-    def __init__(self, name, func):
+    Given func will run until True returns
+    Name must be uniq
+    """
+
+    def __init__(self, name: str, func):
         self.name = name
         self.func = func
 
