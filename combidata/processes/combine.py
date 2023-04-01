@@ -2,7 +2,6 @@ import copy
 import random
 
 
-
 def check_join(main, rule):
     if rule is None:
         return False
@@ -12,6 +11,7 @@ def check_join(main, rule):
             if len(mode.intersection(main[field])) == 0:
                 return False
     return True
+
 
 def join_requirements(a, b):
     left = copy.deepcopy(a)
@@ -23,10 +23,12 @@ def join_requirements(a, b):
             right.update({field: mode})
     return right
 
+
 def recu_update_test_seed(init_lib, requirements, test_seed):
-    formed_requirements = {field: {mode} if mode is isinstance(mode, set) else mode for field, mode in test_seed.items()}
+    formed_requirements = {field: {mode} if not isinstance(mode, set) else mode for field, mode in
+                           test_seed.items()}
     if check_join(formed_requirements, requirements):
-        env_requirements = copy.deepcopy(requirements)  # for not chosen cases
+        env_requirements = copy.deepcopy(requirements)  # TODO for not chosen cases
         for field in list(set(requirements.keys()).intersection(set(formed_requirements.keys()))):
             del env_requirements[field]
         if len(env_requirements.keys()) == 0:
@@ -40,15 +42,19 @@ def recu_update_test_seed(init_lib, requirements, test_seed):
                 possible_formed_requirements = copy.deepcopy(formed_requirements)
                 possible_formed_requirements.update({current_field: {mode}})
                 possible_env_requirements = copy.deepcopy(env_requirements)
-                if (exp:=recu_update_test_seed(init_lib, possible_env_requirements, possible_formed_requirements)) is not None:
+                if (exp := recu_update_test_seed(init_lib, possible_env_requirements,
+                                                 possible_formed_requirements)) is not None:
                     return exp
             else:
                 mode_requirements = init_lib[current_field][mode].requirements
-                if check_join(formed_requirements, mode_requirements) and check_join(env_requirements, mode_requirements):
+                if check_join(formed_requirements, mode_requirements) and check_join(env_requirements,
+                                                                                     mode_requirements):
                     new_requirements = join_requirements(env_requirements, mode_requirements)
                     possible_formed_requirements = copy.deepcopy(formed_requirements)
                     possible_formed_requirements.update({current_field: {mode}})
-                    if (exp := recu_update_test_seed(init_lib, new_requirements, possible_formed_requirements)) is not None:
+                    if (
+                            exp := recu_update_test_seed(init_lib, new_requirements,
+                                                         possible_formed_requirements)) is not None:
                         return exp
         return None
     return None
@@ -71,31 +77,30 @@ def recu_create_test_seed(init_lib, test_seed):
         else:
             possible_test_seed = copy.deepcopy(test_seed)
             possible_test_seed.update({field: example_mode})
-            if (possible_test_seed := recu_update_test_seed(init_lib, init_lib[field][example_mode].requirements, possible_test_seed)) is not None:
-                possible_test_seed = {field: name if not isinstance(name, set) else name.pop() for field, name in possible_test_seed.items()}
+            if (possible_test_seed := recu_update_test_seed(init_lib, init_lib[field][example_mode].requirements,
+                                                            possible_test_seed)) is not None:
+                possible_test_seed = {field: name if not isinstance(name, set) else name.pop() for field, name in
+                                      possible_test_seed.items()}
                 if (new_test_seed := recu_create_test_seed(init_lib, copy.deepcopy(possible_test_seed))) is not None:
                     return new_test_seed
     return None
 
 
-
 def combine(combination):
     combination.test_seed = {combination.main_case.field_name: combination.main_case.field_mode}
 
-
     if combination.main_case.requirements is not None:
-        assert (new_test_seed := recu_update_test_seed(combination.init_lib, combination.main_case.requirements, combination.test_seed)), "Can't combine!"
-        combination.test_seed = {field: name if not isinstance(name, set) else name.pop() for field, name in new_test_seed.items()}
-
+        assert (new_test_seed := recu_update_test_seed(combination.init_lib, combination.main_case.requirements,
+                                                       combination.test_seed)), "Can't combine!"
+        combination.test_seed = {field: name if not isinstance(name, set) else name.pop() for field, name in
+                                 new_test_seed.items()}
 
     if (new_test_seed := recu_create_test_seed(combination.init_lib, copy.deepcopy(combination.test_seed))) is None:
         raise "Can't combine!"
     else:
         combination.test_seed.update(new_test_seed)
 
-
-
-    combination.other_cases = {field: combination.init_lib[field][mode] for field, mode in combination.test_seed.items() if field != combination.main_case.field_name}
+    combination.other_cases = {field: combination.init_lib[field][mode] for field, mode in combination.test_seed.items()
+                               if field != combination.main_case.field_name}
 
     return True
-

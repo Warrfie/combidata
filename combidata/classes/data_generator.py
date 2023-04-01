@@ -1,7 +1,35 @@
+import copy
 import random
 
 from combidata.classes.case import Case
 from combidata.classes.combination import Combination, step_not_done
+
+
+def extend_dict(input_dict, final_key_count):
+    output_dict = {}
+    dict_keys = list(input_dict.keys())
+    key_count = len(dict_keys)
+
+    i = 0
+    added_key_count = 0
+    shuffle_point = 0 if key_count > final_key_count else (final_key_count // key_count) * key_count
+
+    while added_key_count < final_key_count:
+        if i % key_count == 0 and i == shuffle_point:
+            random.shuffle(dict_keys)
+        key = dict_keys[i % key_count]
+        value = input_dict[key]
+
+        if i < key_count:
+            output_dict[key] = copy.deepcopy(value)
+        else:
+            extended_key = f"{key}[{i // key_count}]"
+            output_dict[extended_key] = copy.deepcopy(value)
+
+        i += 1
+        added_key_count += 1
+
+    return output_dict
 
 
 class DataGenerator:
@@ -36,6 +64,7 @@ class DataGenerator:
 
     def __init__(self, library: dict, banned_fields: None | list = None, possible_fields: None | list = None,
                  possible_modes: None | dict = None, type_of_cases: None | str = None, amount: int = None):
+        assert amount is None or (isinstance(amount, int) and amount > 0), "amount must be integer > 0"
         assert banned_fields is None or isinstance(banned_fields, list), "banned_fields must be list instance"
         assert possible_fields is None or isinstance(possible_fields, list), "possible_fields must be list instance"
         assert banned_fields is None or possible_fields is None, "You can't use banned_fields and possible_fields arguments simultaneously"
@@ -46,9 +75,9 @@ class DataGenerator:
         for field_name, field in library["cases"].items():
             self.init_lib[field_name] = {}
             for field_mode, case in field.items():
-                self.init_lib[field_name].update({field_mode: Case(case, field_name, field_mode)})
-                if possible_modes is not None and field_name in possible_modes.keys() and field_mode not in \
-                        possible_modes[field_name]:
+                self.init_lib[field_name].update({field_mode: (case if isinstance(case, Case) else Case(case, field_name, field_mode))})
+                if possible_modes is not None and field_name in possible_modes.keys() and field_mode != possible_modes[
+                    field_name]:
                     self.init_lib[field_name][field_mode].type_of_case = "OFF"
 
         if possible_fields is not None or banned_fields is not None:
@@ -75,17 +104,18 @@ class DataGenerator:
                     self.combinations.update({case.case_name: Combination(case, self.workflow, self.init_lib,
                                                                           self.template, self.tools)})
 
-        if amount is not None:  # TODO for next realises — upgrade that algorithm
-            if amount >= len(self.combinations.keys()):
-                return  # TODO for next realises — make additional cases
-            for _ in range(len(self.combinations.keys()) - amount):
-                del self.combinations[random.choice(list(self.combinations.keys()))]
+        if amount is not None:
+            self.combinations = extend_dict(self.combinations, amount)
 
     def run(self):
         workflow = self.workflow.pop(0) if isinstance(self.workflow, list) else self.workflow
+        combinations = list(self.combinations.values())
 
         for current_step in workflow:
-            while step_not_done(current_step.name, list(self.combinations.values())):
-                for combination in self.combinations.values():
+            while step_not_done(current_step.name, combinations):
+                for combination in combinations:
                     if combination.step_done != current_step.name:
                         current_step.activate(combination)
+
+    def get_one(self):
+        return self.combinations[random.choice(list(self.combinations.keys()))]

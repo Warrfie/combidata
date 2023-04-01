@@ -31,27 +31,25 @@ class Case:
     """
 
     def __init__(self, case: dict, field_name: str, field_mode: str):
-
-        self.additional_fields = copy.deepcopy(case)  # TODO make normal warehouse
         # TODO add additional checks
         self.field_name = field_name
         self.field_mode = field_mode
         self.case_name = case["name"]
 
-        self.value = None if "value" not in case.keys() else case["value"]
-
-        self.type_of_case = None if "type" not in case.keys() else case["type"]
-
-        self.gen_func = None if "gen_func" not in case.keys() else case["gen_func"]
-
-        self.is_presented = True if "is_presented" not in case.keys() else case["is_presented"]
+        self.value = case.get("value", None)
+        self.type_of_case = case.get("type", None)
+        self.gen_func = case.get("gen_func", None)
+        self.is_presented = case.get("is_presented", True)
+        self.options = case.get("options", None)
 
         if "requirements" not in case.keys():
             self.requirements = None
         else:
             self.hand_requirements(case["requirements"])
 
-        self.options = None if "options" not in case.keys() else case["options"]
+        self.additional_fields = self.form_additional_fields(case)
+
+
 
     def hand_requirements(self, requirements):
         if isinstance(requirements, dict):
@@ -65,3 +63,7 @@ class Case:
                     raise f"In case '{self.case_name}' requirements modes is not set or list instance"
         else:
             raise f"In case '{self.case_name}' requirements is not dict instance"
+
+    def form_additional_fields(self, case):
+        keys_list = ["name", "value", "type", "gen_func", "is_presented", "options", "requirements"]
+        return copy.deepcopy({key: value for key, value in case.items() if key not in keys_list})

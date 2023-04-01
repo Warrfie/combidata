@@ -4,12 +4,21 @@
 
 # <p align="center">Combidata
 
-<p align="center">A simple and light package for QA development which can generate random data from given cases.</p>
-The main mechanics of the library is DataGenerator instance consume test flags and dictionary
-with all cases, form and workflow. Creates Combination instances from possible cases. 
-Via run function combination processes all steps from workflow.
+Combidata is a flexible and powerful Python library designed for generating various combinations of test data based on defined cases and rules. 
+It is especially useful for testing, debugging, and analyzing software applications and systems.
 
-###<p align="center">Structure of input library
+
+The core functionality of the Combidata library is provided by the `DataGenerator` class, which takes in test flags and a dictionary containing all cases, forms, and workflows. 
+The `DataGenerator` creates `Combination` instances from the possible cases. 
+The `run` function in each `Combination` instance processes all steps in the specified workflow.
+
+## New features
+1.0.8:
+1) Now you can use multiply symbols modes
+2) Generate any number of data combinations, even if there are only a few cases.
+3) Use the `get_one()` function in the `DataGenerator` class for generating a single Combination object.
+
+## Structure of input library
 
 ```python
 library = {
@@ -19,13 +28,17 @@ library = {
             "template": {}
 }
 ```
+The `cases` key contains a library instance with all your defined cases. 
 
-Key "cases" holds only lib instance with all your cases
-Key "workflow" holds list or tuple with processes
-Key "tools" holds dictionary with items which can be used in processes
-Key "template" holds a template for export result
+The `workflow` key stores a list of tuple or one tuple of processes to be executed. 
+If you use list, every `run()` function will process all steps in the current tuple
 
-###<p align="center">Cases
+The `tools` key holds a dictionary with items that can be utilized within the processes. 
+
+Finally, the `template` key contains a template used for exporting the results.
+
+
+## Cases
 
 Cases structure hold fields names as keys and every field name holds field cases codes as a keys
 and every field cases codes holds case structure. 
@@ -33,17 +46,17 @@ I know, very complicate, but example will help you:
 
 ```python
 library["cases"]["NAME"] = {
-        "T": {
+        "True": {
             "gen_func": re_generate,
             "value": r"[a-zA-Z]{50}",
             "name": "Standart NAME check"
         },
-        "F": {
+        "False": {
             "value": "12345",
             "type": "error",
             "name": "Check NAME with error"
         },
-        "N": {
+        "None": {
             "value": None,
             "requirements": {"CODE": "T"},
             "is_presented": False,
@@ -72,7 +85,7 @@ Let's know about keys in case structure:
 "requirements" - (dictionary) holds possible modes of another fields
 "type" - (string) Generator will choose that case like main case when you will run test of that type
 
-###<p align="center">Workflow
+## Workflow
 
 Holds tuple of processes or list of processes. When you will run combination or generator it will run all processes in tuple
 Also yoy can use dict for hold workflow for tests with different types. "standard" is reserved key for standard workflow
@@ -101,7 +114,7 @@ you can stop all workflow just put in combination.step_done reserved string "STO
 combination.step_done = "STOP"
 ```
 
-###<p align="center">Tools
+## Tools
 Just warehouse for items, funcs or other stuff that you can use in steps or generators via .tools
 ```python
 "tools": {
@@ -115,7 +128,7 @@ block = combination.tools["UTILS"].get_block()
 
 ```
 
-###<p align="center">Template
+## Template
 Holds template of generation result. All case codes will be reserved and will be replaced in template
 like that
 ```python
@@ -128,7 +141,7 @@ Result will look like
 
     {"NAME": "azRkdSS", "code": "12GG233"}
 
-###<p align="center">Example
+## Example
 
 ```python
 import pytest
@@ -216,7 +229,7 @@ And never failed because I made requirements to "NAME" - "N" field
 
 I added it in project "tests" directory
 
-## Getting started
+## Installation
 
 This package is tested with Python 3.9-3.11 and Pypy 3.
 There are two ways to install the library:
@@ -244,3 +257,22 @@ It is generally recommended to use the first option.
 ```
 pip install combidata --upgrade
 ```
+
+## Contributing
+Contributions are welcome! Please feel free to submit pull requests, report bugs, or suggest new features through the GitHub repository. We appreciate your help in improving Combidata!
+
+## License
+Combidata is released under the MIT License. See the LICENSE file for more details.
+
+## Support
+If you need help with Combidata or have any questions, please open an issue on GitHub or contact the maintainers directly 
+
+Telegram — https://t.me/sasisochka
+
+Linkedin — https://www.linkedin.com/in/yasasisochka/
+
+
+## Acknowledgments
+A special thanks to the community for their support, contributions, and valuable feedback. Your input helps make Combidata a better tool for everyone!
+
+With Combidata, you can easily generate test data for your applications and systems, ensuring that they are robust and reliable under various conditions. Start using Combidata today to improve the quality of your testing and development process!

@@ -19,14 +19,18 @@ def generate_value(all_fields, case, combination: Combination):
             if isinstance(field, str) and field in test_seed.keys():
                 if field in generated_data.keys():
                     options.update({key: generated_data[field]})
+                elif not combination.init_lib[field][test_seed[field]].is_presented:
+                    options.update({key: combination.init_lib[field][test_seed[field]].value})
                 else:
                     generate_value(all_fields, cases[field], combination)
                     options.update({key: generated_data[field]})
             elif isinstance(field, str) and field == "combination":
                 options.update({key: combination})
+            elif isinstance(field, str) and field == "value":
+                options.update({key: case.value})
             else:
                 options.update({key: field})
-        item_value = case.gen_func(case.value, **options)
+        item_value = case.gen_func(**options) if len(options) > 0 else case.gen_func()
 
     if case.is_presented:
         generated_data.update({case.field_name: item_value})
