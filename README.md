@@ -13,6 +13,9 @@ The `DataGenerator` creates `Combination` instances from the possible cases.
 The `run` function in each `Combination` instance processes all steps in the specified workflow.
 
 ## New features
+1.0.9:
+1) Now you can use 'types_for_generation' in initialisation of 'DataGenerator'
+
 1.0.8:
 1) Now you can use multiply symbols modes
 2) Generate any number of data combinations, even if there are only a few cases.

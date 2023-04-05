@@ -6,9 +6,9 @@ from combidata.classes.case import Case
 from combidata.classes.combination import Combination
 
 from combidata import ST_COMBINE, ST_GENERATE, ST_FORM, DataGenerator, Process
-import re_generate
+from re_generate import re_generate
 
-re_generate = re_generate.get_str
+
 
 
 def code_generator(combination, example_token):
@@ -70,10 +70,10 @@ library["cases"]["CODE"] = {
         "value": "wa69sf",
         "name": "Example CODE"
     },
-    "Case": Case({
-        "value": "wa69sf",
-        "name": "Example Case"
-    }, "CODE", "Case")
+    "Case": {
+        "value": "CASE",
+        "name": "Case CODE"
+    }
 }
 library["cases"]["SAVES"] = {
     "None": {

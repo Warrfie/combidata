@@ -46,6 +46,8 @@ class DataGenerator:
 
     type_of_cases: What types will be main cases
 
+    types_for_generation: What types will be chosen as standard cases
+
     amount: amount of tests
 
     Stored
@@ -62,20 +64,24 @@ class DataGenerator:
 
     """
 
-    def __init__(self, library: dict, banned_fields: None | list = None, possible_fields: None | list = None,
-                 possible_modes: None | dict = None, type_of_cases: None | str = None, amount: int = None):
+    def __init__(self, library: dict,
+                 banned_fields: None | list = None,
+                 possible_fields: None | list = None,
+                 possible_modes: None | dict = None,
+                 type_of_cases: None | str = None,
+                 types_for_generation: None | str | list = None,
+                 amount: int = None):
         assert amount is None or (isinstance(amount, int) and amount > 0), "amount must be integer > 0"
         assert banned_fields is None or isinstance(banned_fields, list), "banned_fields must be list instance"
         assert possible_fields is None or isinstance(possible_fields, list), "possible_fields must be list instance"
         assert banned_fields is None or possible_fields is None, "You can't use banned_fields and possible_fields arguments simultaneously"
 
-        self.combinations = {}
-
         self.init_lib = {}
         for field_name, field in library["cases"].items():
             self.init_lib[field_name] = {}
             for field_mode, case in field.items():
-                self.init_lib[field_name].update({field_mode: (case if isinstance(case, Case) else Case(case, field_name, field_mode))})
+                self.init_lib[field_name].update(
+                    {field_mode: (case if isinstance(case, Case) else Case(case, field_name, field_mode))})
                 if possible_modes is not None and field_name in possible_modes.keys() and field_mode != possible_modes[
                     field_name]:
                     self.init_lib[field_name][field_mode].type_of_case = "OFF"
@@ -97,17 +103,25 @@ class DataGenerator:
             self.workflow = library["workflow"]
         # TODO for next realises — make more consistency checks
 
+        copy_of_init_lib = copy.deepcopy(self.init_lib)
+        if not isinstance(types_for_generation, list):
+            types_for_generation = [types_for_generation]
+        for field_name, field in copy_of_init_lib.items():
+            for field_mode, case in field.items():
+                case.type_of_case = None if case.type_of_case in types_for_generation else "OFF"
+
+        self.combinations = {}
         for field_name, cases in self.init_lib.items():
             for field_mode, case in cases.items():
                 if case.type_of_case == type_of_cases:
                     assert case.case_name not in self.combinations.keys(), case.case_name + " - is not unique"
-                    self.combinations.update({case.case_name: Combination(case, self.workflow, self.init_lib,
+                    self.combinations.update({case.case_name: Combination(case, self.workflow, copy_of_init_lib,
                                                                           self.template, self.tools)})
 
         if amount is not None:
             self.combinations = extend_dict(self.combinations, amount)
 
-    def run(self):
+    def run(self):  # todo make STOP
         workflow = self.workflow.pop(0) if isinstance(self.workflow, list) else self.workflow
         combinations = list(self.combinations.values())
 
