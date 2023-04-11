@@ -76,13 +76,18 @@ class DataGenerator:
         assert possible_fields is None or isinstance(possible_fields, list), "possible_fields must be list instance"
         assert banned_fields is None or possible_fields is None, "You can't use banned_fields and possible_fields arguments simultaneously"
 
+        if possible_modes is not None:
+            for key, value in possible_modes.items():
+                if isinstance(value, str):
+                    possible_modes[key] = [value]
+
         self.init_lib = {}
         for field_name, field in library["cases"].items():
             self.init_lib[field_name] = {}
             for field_mode, case in field.items():
                 self.init_lib[field_name].update(
                     {field_mode: (case if isinstance(case, Case) else Case(case, field_name, field_mode))})
-                if possible_modes is not None and field_name in possible_modes.keys() and field_mode != possible_modes[
+                if possible_modes is not None and field_name in possible_modes.keys() and field_mode not in possible_modes[
                     field_name]:
                     self.init_lib[field_name][field_mode].type_of_case = "OFF"
 
