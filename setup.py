@@ -7,14 +7,14 @@ long_description = (here / "README.md").read_text(encoding="utf-8")
 
 setup(
     name="combidata",
-    version="0.1.9",
+    version="0.2.0",
     description="Package for random data generation and combination different cases",
     long_description=long_description,
     url="https://github.com/Warrfie/combidata",
     author="Kuklikov Maxim (Warrfie)",
     author_email="warrfie@gmail.com",
     classifiers=[
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 4 - Beta",
         "Intended Audience :: Information Technology",
         "Topic :: Software Development :: Quality Assurance",
         "License :: OSI Approved :: MIT License",
