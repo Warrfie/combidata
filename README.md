@@ -280,6 +280,9 @@ Linkedin — https://www.linkedin.com/in/yasasisochka/
 
 
 ## Acknowledgments
-A special thanks to the community for their support, contributions, and valuable feedback. Your input helps make Combidata a better tool for everyone!
+A special thanks to the community for their support, contributions, and valuable feedback. Your input helps make Combidata a better tool for everyone! And a special thanks to JetBrains for their best software and License for Open Source Development.
+
+
+[![JetBrains Black Box Logo logo](https://resources.jetbrains.com/storage/products/company/brand/logos/jb_square.png)](https://jb.gg/OpenSourceSupport)
 
 With Combidata, you can easily generate test data for your applications and systems, ensuring that they are robust and reliable under various conditions. Start using Combidata today to improve the quality of your testing and development process!
