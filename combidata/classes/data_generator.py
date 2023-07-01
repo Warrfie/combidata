@@ -76,10 +76,14 @@ class DataGenerator:
         assert possible_fields is None or isinstance(possible_fields, list), "possible_fields must be list instance"
         assert banned_fields is None or possible_fields is None, "You can't use banned_fields and possible_fields arguments simultaneously"
 
-        if possible_modes is not None:
-            for key, value in possible_modes.items():
+        modes_for_gen = copy.deepcopy(possible_modes)
+
+        if modes_for_gen is not None:
+            for key, value in modes_for_gen.items():
                 if isinstance(value, str):
-                    possible_modes[key] = [value]
+                    modes_for_gen[key] = [value]
+
+
 
         self.init_lib = {}
         for field_name, field in library["cases"].items():
@@ -87,9 +91,14 @@ class DataGenerator:
             for field_mode, case in field.items():
                 self.init_lib[field_name].update(
                     {field_mode: (case if isinstance(case, Case) else Case(case, field_name, field_mode))})
-                if possible_modes is not None and field_name in possible_modes.keys() and field_mode not in possible_modes[
-                    field_name]:
-                    self.init_lib[field_name][field_mode].type_of_case = "OFF"
+                if modes_for_gen is not None:
+                    if field_name in modes_for_gen.keys() and field_mode not in modes_for_gen[field_name]:
+                        self.init_lib[field_name][field_mode].type_of_case = "OFF"
+                    elif requirements := self.init_lib[field_name][field_mode].requirements:
+                        for rec_field, rec_modes in requirements.items():
+                            if rec_field in modes_for_gen.keys() and not rec_modes & set(modes_for_gen[rec_field]):
+                                self.init_lib[field_name][field_mode].type_of_case = "OFF"
+                                break
 
         if possible_fields is not None or banned_fields is not None:
             banned_fields = banned_fields if possible_fields is None else [field for field in self.init_lib.keys() if

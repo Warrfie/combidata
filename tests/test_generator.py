@@ -1,3 +1,4 @@
+import random
 from pprint import pprint
 
 import pytest
@@ -9,19 +10,20 @@ from combidata import ST_COMBINE, ST_GENERATE, ST_FORM, DataGenerator, Process
 from re_generate import re_generate
 
 
-
-
 def code_generator(combination, example_token):
     # just for test
     return "12GG233"
+
 
 def gen_comb(combination: Combination):
     new_comb = DataGenerator(library, amount=1).get_one()
     new_comb.run()
     return new_comb.generated_data
 
+
 def gen_smile():
     return ":)"
+
 
 def gen_value(value):
     return value
@@ -98,8 +100,6 @@ library["cases"]["SAVES"] = {
     },
 }
 
-
-
 generator = DataGenerator(library, amount=100)
 generator.run()
 
@@ -124,3 +124,14 @@ def test2(combination_name):
     gen_seed.run()
     gen_seed = gen_seed.test_seed
     assert seed == gen_seed
+
+@pytest.mark.parametrize("combination_name", generator.combinations.keys())
+def test3(combination_name):
+    combination = generator.combinations[combination_name]
+    seed = combination.test_seed
+    key = random.choice(list(seed.keys()))
+    seed = {key: seed[key]}
+    print(seed)
+    semi_gen = DataGenerator(library, possible_modes=seed, amount=100)
+    semi_gen.run()
+

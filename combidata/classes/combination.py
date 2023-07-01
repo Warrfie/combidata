@@ -1,10 +1,10 @@
 def step_not_done(current_step_name, combi):
     if isinstance(combi, list):
         for combination in combi:
-            if combination.step_done != current_step_name or combination.step_done == "STOP":
+            if combination.step_done != current_step_name and combination.step_done != "STOP":
                 return True
     else:
-        if combi.step_done != current_step_name or combi.step_done == "STOP":
+        if combi.step_done != current_step_name and combi.step_done != "STOP":
             return True
     return False
 
@@ -53,4 +53,12 @@ class Combination:
         for current_step in workflow:
             while step_not_done(current_step.name, self):
                 if self.step_done != current_step.name:
-                    current_step.activate(self)
+                    try:
+                        current_step.activate(self)
+                    except Exception as e:
+                        self.step_done = "STOP"
+                        if logger := self.tools.get("logger"):
+                            logger.end_test(self.tools.get("id"), str(e))
+                        else:
+                            raise e
+

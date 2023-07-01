@@ -13,6 +13,11 @@ The `DataGenerator` creates `Combination` instances from the possible cases.
 The `run` function in each `Combination` instance processes all steps in the specified workflow.
 
 ## New features
+0.2.1:
+1) So, we have greate problem with possible_modes and other parameters. I patched it but problem still here.
+2) Added logger begin
+3) And also fix bug with 'STOP' signal
+
 0.2.0:
 1) Ok, now its Beta ;)
 2) Fixed combination bug
