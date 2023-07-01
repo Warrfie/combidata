@@ -53,17 +53,17 @@ class Combination:
         for current_step in workflow:
             while step_not_done(current_step.name, self):
                 if self.step_done != current_step.name:
-                    if logger := self.tools.get("logger"):
-                        logger.start_step(self.tools.get("id"), current_step.name)
+                    if start_step := self.tools.get("start_step"):
+                        start_step(self.tools.get("id"), current_step.name)
                     try:
                         current_step.activate(self)
                     except Exception as e:
                         self.step_done = "STOP"
-                        if logger := self.tools.get("logger"):
-                            logger.end_step(self.tools.get("id"), str(e))
+                        if end_step := self.tools.get("end_step"):
+                            end_step(self.tools.get("id"), str(e))
                         else:
                             raise e
                     else:
-                        if logger := self.tools.get("logger"):
-                            logger.end_step(self.tools.get("id"))
+                        if end_step := self.tools.get("end_step"):
+                            end_step(self.tools.get("id"))
 
