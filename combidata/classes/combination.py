@@ -1,3 +1,6 @@
+import traceback
+
+
 def step_not_done(current_step_name, combi):
     if isinstance(combi, list):
         for combination in combi:
@@ -60,7 +63,15 @@ class Combination:
                     except Exception as e:
                         self.step_done = "STOP"
                         if end_step := self.tools.get("end_step"):
-                            end_step(self.tools.get("id"), str(e))
+                            temp_exep = f"An exception occurred: {type(e).__name__}. "
+                            temp_exep += f"Error message: {str(e)}. "
+                            traceback_list = traceback.extract_tb(e.__traceback__)
+                            if traceback_list:
+                                last_traceback = traceback_list[-1]
+                                file_name = last_traceback.filename
+                                line_number = last_traceback.lineno
+                                temp_exep += f"Occurred at: {file_name}:{line_number}. "
+                            end_step(self.tools.get("id"), temp_exep)
                         else:
                             raise e
                     else:
