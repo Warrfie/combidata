@@ -37,13 +37,13 @@ class Case:
         self.case_name = case["name"]
 
         self.value = case.get("value", None)
-        self.type_of_case = case.get("type", None)
+        self.type_of_case = case.get("type", "standard")
         self.gen_func = case.get("gen_func", None)
         self.is_presented = case.get("is_presented", True)
         self.options = case.get("options", None)
 
         if "requirements" not in case.keys():
-            self.requirements = None
+            self.requirements = {}
         else:
             self.hand_requirements(case["requirements"])
 

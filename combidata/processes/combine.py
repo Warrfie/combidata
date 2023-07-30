@@ -2,103 +2,79 @@ import copy
 import random
 
 
-def check_join(main, rule):
-    if rule is None:
-        return False
-
-    for field, mode in rule.items():
-        if field in main.keys():
-            if len(mode.intersection(main[field])) == 0:
-                return False
-    return True
+def crop_types(current_dict, poss_types):
+    for unit, modes in current_dict.items():
+        for mode in list(modes.keys()):
+            if current_dict[unit][mode].type_of_case not in poss_types:
+                del current_dict[unit][mode]
 
 
-def join_requirements(a, b):
-    left = copy.deepcopy(a)
-    right = copy.deepcopy(b)
-    for field, mode in left.items():
-        if field in right.keys():
-            right[field] = mode.intersection(right[field])
-        else:
-            right.update({field: mode})
-    return right
+def form_template(lib):
+    template = {}
+    for field, modes in lib.items():
+        template[field] = {}
+        for mode in modes:
+            template[field][mode] = copy.deepcopy(
+                lib[field][mode])  # TODO fix_it copy.deepcopy(lib[field][mode]) is tooo dum
+            for seed_field, seed_modes in lib.items():
+                if seed_field != field:
+                    template[field][mode].requirements[seed_field] = set(seed_modes)
+    return template
+
+def form_poss(init_lib, neutral_types=None):
+    neutral_lib = form_template(init_lib)
+
+    for field, modes in init_lib.items():
+        for mode in modes:
+            if init_lib[field][mode].requirements:
+                for req_unit, req_modes in init_lib[field][mode].requirements.items():
+                    if req_unit in neutral_lib.keys() and mode in neutral_lib[field].keys():
+                        neutral_lib[field][mode].requirements[req_unit] = req_modes & \
+                                                                          neutral_lib[field][mode].requirements[
+                                                                              req_unit]
+                        if not neutral_lib[field][mode].requirements[req_unit]:
+                            del neutral_lib[field][mode]
+                        modes_for_hunt = set(neutral_lib[req_unit].keys()) - req_modes
+                        for target_mode in modes_for_hunt:
+                            neutral_lib[req_unit][target_mode].requirements[field] = \
+                                neutral_lib[req_unit][target_mode].requirements[field] - set(mode)
+                            if not neutral_lib[req_unit][target_mode].requirements[field]:
+                                del neutral_lib[req_unit][target_mode]
+
+    if neutral_types is not None:
+        crop_types(neutral_lib, neutral_types)
+
+    return neutral_lib
 
 
-def recu_update_test_seed(init_lib, requirements, test_seed):
-    formed_requirements = {field: {mode} if not isinstance(mode, set) else mode for field, mode in
-                           test_seed.items()}
-    if check_join(formed_requirements, requirements):
-        env_requirements = copy.deepcopy(requirements)  # TODO for not chosen cases
-        for field in list(set(requirements.keys()).intersection(set(formed_requirements.keys()))):
-            del env_requirements[field]
-        if len(env_requirements.keys()) == 0:
-            return formed_requirements
-        current_field = list(env_requirements.keys())[0]
-        inert_modes = [mode for mode in list(env_requirements[current_field]) if
-                       init_lib[current_field][mode].type_of_case is None]
+def process_mode(seed, poss_di, chosen_unit, chosen_mode):
+    for pos_unit, pos_modes in poss_di[chosen_unit][chosen_mode].requirements.items():
+        if poss_di.get(pos_unit):
+            modes_for_del = set(poss_di[pos_unit].keys()) - set(pos_modes)
+            for mode_for_del in modes_for_del:
+                del poss_di[pos_unit][mode_for_del]
+    seed[chosen_unit] = chosen_mode
+    del poss_di[chosen_unit]
+    return form_poss(poss_di)
 
-        for mode in inert_modes:
-            if init_lib[current_field][mode].requirements is None:
-                possible_formed_requirements = copy.deepcopy(formed_requirements)
-                possible_formed_requirements.update({current_field: {mode}})
-                possible_env_requirements = copy.deepcopy(env_requirements)
-                if (exp := recu_update_test_seed(init_lib, possible_env_requirements,
-                                                 possible_formed_requirements)) is not None:
-                    return exp
-            else:
-                mode_requirements = init_lib[current_field][mode].requirements
-                if check_join(formed_requirements, mode_requirements) and check_join(env_requirements,
-                                                                                     mode_requirements):
-                    new_requirements = join_requirements(env_requirements, mode_requirements)
-                    possible_formed_requirements = copy.deepcopy(formed_requirements)
-                    possible_formed_requirements.update({current_field: {mode}})
-                    if (
-                            exp := recu_update_test_seed(init_lib, new_requirements,
-                                                         possible_formed_requirements)) is not None:
-                        return exp
-        return None
-    return None
+def generate_seed(di, main_unit, main_mode):
+    poss_di = copy.deepcopy(di)
+    seed = {}
 
+    poss_di = process_mode(seed, poss_di, main_unit, main_mode)
 
-def recu_create_test_seed(init_lib, test_seed):
-    non_combined_fields = [field for field in init_lib.keys() if field not in test_seed.keys()]
-    if len(non_combined_fields) == 0:
-        return test_seed
-    field = non_combined_fields[0]
-    cases = init_lib[field]
-    field_modes = [case.field_mode for case in cases.values() if case.type_of_case is None]
-    random.shuffle(field_modes)
-    for example_mode in field_modes:
-        if cases[example_mode].requirements is None:
-            new_test_seed = copy.deepcopy(test_seed)
-            new_test_seed.update({field: example_mode})
-            if (new_test_seed := recu_create_test_seed(init_lib, new_test_seed)) is not None:
-                return new_test_seed
-        else:
-            possible_test_seed = copy.deepcopy(test_seed)
-            possible_test_seed.update({field: example_mode})
-            if (possible_test_seed := recu_update_test_seed(init_lib, init_lib[field][example_mode].requirements,
-                                                            possible_test_seed)) is not None:
-                possible_test_seed = {field: name if not isinstance(name, set) else name.pop() for field, name in
-                                      possible_test_seed.items()}
-                if (new_test_seed := recu_create_test_seed(init_lib, copy.deepcopy(possible_test_seed))) is not None:
-                    return new_test_seed
-    return None
+    while poss_di:
+        chosen_unit = random.choice(list(poss_di.keys()))
+        chosen_mode = random.choice(list(poss_di[chosen_unit].keys()))
+        poss_di = process_mode(seed, poss_di, chosen_unit, chosen_mode)
 
+    return seed
 
 def combine(combination):
-    combination.test_seed = {combination.main_case.field_name: combination.main_case.field_mode}
+    neutral_lib = combination.init_lib
+    main_case = combination.main_case
 
-    if combination.main_case.requirements is not None:
-        assert (new_test_seed := recu_update_test_seed(combination.init_lib, combination.main_case.requirements,
-                                                       combination.test_seed)), "Can't combine!"
-        combination.test_seed = {field: name if not isinstance(name, set) else name.pop() for field, name in
-                                 new_test_seed.items()}
-
-    if (new_test_seed := recu_create_test_seed(combination.init_lib, copy.deepcopy(combination.test_seed))) is None:
-        raise "Can't combine!"
-    else:
-        combination.test_seed.update(new_test_seed)
+    combination.test_seed = generate_seed(neutral_lib, main_case.field_name, main_case.field_mode)
 
     combination.other_cases = {field: combination.init_lib[field][mode] for field, mode in combination.test_seed.items()
                                if field != combination.main_case.field_name}

@@ -37,11 +37,13 @@ class Combination:
 
     step_done = None  # last passed step
 
-    def __init__(self, case, workflow, init_lib, template, tools):
+    def __init__(self, case, workflow, init_lib, template, tools, logger, generator_id):
         self.init_lib = init_lib
         self.main_case = case
         self.template = template
         self.tools = tools
+        self.logger = logger
+        self.generator_id = generator_id
 
         self.generated_data = {}
         self.other_cases = {}
@@ -56,13 +58,13 @@ class Combination:
         for current_step in workflow:
             while step_not_done(current_step.name, self):
                 if self.step_done != current_step.name:
-                    if start_step := self.tools.get("start_step"):
-                        start_step(self.tools.get("id"), current_step.name)
+                    if self.logger:
+                        self.logger.start_step(self.generator_id, current_step.name)
                     try:
                         current_step.activate(self)
                     except Exception as e:
                         self.step_done = "STOP"
-                        if end_step := self.tools.get("end_step"):
+                        if self.logger:
                             temp_exep = f"An exception occurred: {type(e).__name__}. "
                             temp_exep += f"Error message: {str(e)}. "
                             traceback_list = traceback.extract_tb(e.__traceback__)
@@ -71,10 +73,10 @@ class Combination:
                                 file_name = last_traceback.filename
                                 line_number = last_traceback.lineno
                                 temp_exep += f"Occurred at: {file_name}:{line_number}. "
-                            end_step(self.tools.get("id"), temp_exep)
+                            self.logger.end_step(self.generator_id, temp_exep)
                         else:
                             raise e
                     else:
-                        if end_step := self.tools.get("end_step"):
-                            end_step(self.tools.get("id"))
+                        if self.logger:
+                            self.logger.end_step(self.generator_id)
 
