@@ -1,3 +1,4 @@
+import copy
 import traceback
 
 
@@ -38,7 +39,7 @@ class Combination:
     step_done = None  # last passed step
 
     def __init__(self, case, workflow, init_lib, template, tools, logger, generator_id):
-        self.init_lib = init_lib
+        self.init_lib = copy.deepcopy(init_lib)
         self.main_case = case
         self.template = template
         self.tools = tools
