@@ -52,6 +52,8 @@ class Combination:
 
         self.workflow = workflow
 
+        self.init_lib[self.main_case.field_name] = {self.main_case.field_mode: self.main_case}
+
     def run(self):
         self.workflow = list(self.workflow) if isinstance(self.workflow, list) else self.workflow  # todo beautify
         workflow = self.workflow.pop(0) if isinstance(self.workflow, list) else self.workflow
