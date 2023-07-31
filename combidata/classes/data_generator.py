@@ -1,6 +1,7 @@
 import copy
 import random
 import traceback
+from pprint import pprint
 
 from combidata.classes.case import Case
 from combidata.classes.combination import Combination, step_not_done
@@ -137,14 +138,20 @@ class DataGenerator:
             types_for_generation = ["standard"]
         if not isinstance(types_for_generation, list):
             types_for_generation = [types_for_generation]
-        neutral_lib = self.form_neutral_lib(self.init_lib, types_for_generation)
+        neutral_lib = self.form_neutral_lib(self.init_lib)
+        self.spread_requirements(neutral_lib)
+        crop_types(neutral_lib, types_for_generation)
 
         self.combinations = self.find_combinations(neutral_lib, type_of_cases)
 
-        assert self.combinations, "No combinations for tests"
+        assert self.combinations, "No combinations for tests" #TODO deep logging needed
 
         if amount is not None:
             self.combinations = extend_dict(self.combinations, amount)
+    def spread_requirements(self, neutral_lib):
+        for field, modes in neutral_lib.items():
+            for mode, case in modes.items():
+                self.init_lib[field][mode].requirements = case.requirements
 
     def find_combinations(self, neutral_lib, type_of_cases):
         all_combinations = {}
@@ -234,7 +241,7 @@ class DataGenerator:
             for field in banned_fields:
                 del self.init_lib[field]
 
-    def form_neutral_lib(self, init_lib, neutral_types):
+    def form_neutral_lib(self, init_lib):
         neutral_lib = form_template(init_lib)
 
         for field, modes in init_lib.items():
@@ -260,6 +267,6 @@ class DataGenerator:
                                         self.logger.add_log(self.generator_id,
                                                             f"Mode: {target_mode} in field: {req_unit}: Was deleted because will never use in generation")
 
-        crop_types(neutral_lib, neutral_types)
+
 
         return neutral_lib
