@@ -82,4 +82,8 @@ def combine(combination):
     combination.other_cases = {field: combination.init_lib[field][mode] for field, mode in combination.test_seed.items()
                                if field != combination.main_case.field_name}
 
+    if combination.logger:
+        combination.logger.add_log(combination.generator_id,
+                            f"Generated seed: {str(combination.test_seed)}")
+
     return True
