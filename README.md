@@ -17,13 +17,13 @@ pip install combidata
 
 ## Table of Contents
 
-- [Installation](https://warrfie.github.io/combidata/Installation.md)
-- [All entities](https://warrfie.github.io/combidata/Cases.md)
-  - [Process](https://warrfie.github.io/combidata/Process.md)
-  - [Cases](https://warrfie.github.io/combidata/Cases.md)
-  - [Combination](https://warrfie.github.io/combidata/Combination.md)
-  - [DataGenerator](https://warrfie.github.io/combidata/DataGenerator.md)
-- [Quick Start Guide](https://warrfie.github.io/combidata/QSG.md)
+- [Installation](https://warrfie.github.io/combidata/Installation)
+- [All entities](https://warrfie.github.io/combidata/Cases)
+  - [Process](https://warrfie.github.io/combidata/Process)
+  - [Cases](https://warrfie.github.io/combidata/Cases)
+  - [Combination](https://warrfie.github.io/combidata/Combination)
+  - [DataGenerator](https://warrfie.github.io/combidata/DataGenerator)
+- [Quick Start Guide](https://warrfie.github.io/combidata/QSG)
 
 ## Overview
 
