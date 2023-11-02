@@ -1,0 +1,27 @@
+site_name: Combidata Library
+repo_url: https://github.com/Warrfie/combidata
+repo_name: Warrfie/Сombidata
+nav:
+  - Home: index.md
+  - Installation: Installation.md
+  - All entities:
+    - Process: Process.md
+    - Cases: Cases.md
+    - Combination: Combination.md
+    - DataGenerator: DataGenerator.md
+  - Quick Start Guide: QSG.md
+theme:
+  name: material
+  logo: assets/logo.svg
+  favicon: assets/logo.svg
+  features:
+    - header.autohide
+    - navigation.tabs
+    - navigation.path
+    - navigation.top
+  palette:
+    scheme: slate
+    primary: black
+
+markdown_extensions:
+  - pymdownx.superfences

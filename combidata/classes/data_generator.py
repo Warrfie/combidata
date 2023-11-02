@@ -75,35 +75,31 @@ def extend_dict(input_dict, final_key_count):
 
 class DataGenerator:
     """
-    Input
+DataGenerator Class:
 
-    library: Main library with all cases and main info (dict)
+Responsible for generating test data based on the provided configurations and library of cases.
 
-    banned_fields: What fields can't be combined
+    Attributes:
 
-    possible_fields: What fields can be combined
+    - library (dict): The primary library containing all test cases and associated information.
+    - banned_fields (list): Fields that should not be combined during test generation.
+    - possible_fields (list): Fields that are eligible for combination during test generation.
+    - possible_modes (dict): Modes that can be combined for test generation.
+    - type_of_cases (list or str): Specifies the types that will be used as main cases.
+    - types_for_generation (list or str): Types that will be selected as standard cases for test generation.
+    - amount (int): The number of tests to be generated.
 
-    possible_modes: What modes can be combined
+    Stored Attributes:
 
-    type_of_cases: What types will be main cases
+    - combinations (dict): A dictionary storing combinations with the main full case name as the key and instances of the Combination class as values.
+    - init_lib (dict): A processed copy of the main library.
+    - template (dict): Contains the export template for the generated tests.
+    - tools (dict): A dictionary of tools and utilities that can be utilized during test processes.
+    - workflow (list/tuple): A collection of processes that define the test generation workflow.
 
-    types_for_generation: What types will be chosen as standard cases
-
-    amount: amount of tests
-
-    Stored
-
-    combinations: dictionary with main full case name as a key and Combination items (dict)
-
-    init_lib: handled copy of main library (dict)
-
-    template: holds export template (dict)
-
-    tools: holds dictionary with items which can be used in processes (dict)
-
-    workflow: holds list or tuple with processes
-
-    """
+Note:
+    The DataGenerator class plays a central role in the test generation process, ensuring that tests are created based on the specified criteria and configurations.
+"""
 
     def __init__(self, library: dict,
                  banned_fields: None | list = None,

@@ -3,31 +3,42 @@ import copy
 
 class Case:
     """
-    Presents one variation of field
+    Represents a specific variation or scenario for a given field.
 
-    field_name: holds name of field. In initial lib - hashable key that holds cases (str)
+    Attributes:
 
-    field_mode: holds case mode (short name). In initial lib - hashable key that holds case (str)
+    - field_name (str): Name of the field. Serves as a unique identifier
+      for the field.
 
-    case_name: holds case full name. Key "name" in initial lib (str)
+    - field_mode (str): Concise identifier for the case mode. Provides a
+      quick reference to the type or mode of the case.
 
-    gen_func: holds function for generation. By default, takes only one argument if you use options,
-    can take more. Key "gen_func" in initial lib (function)
+    - case_name (str): Full descriptive name of the case.
 
-    value: holds case value. It will be first argument of gen_func if gen_func in case else it will be result.
-    Key "value" in initial lib (anything)
+    - gen_func (function): Function for generating data/values for the case.
+      Accepts 'value' as its default argument. If additional options are
+      provided, they can be unpacked into this function.
 
-    options: holds functions and another stuff which will unpack into gen_func. "combination" is reserved string.
-    Key "options" in initial lib (dictionary)
+    - value (any): Primary value for the case. Used as the result if no
+      gen_func is defined, otherwise passed as the first argument to gen_func.
 
-    is_presented: holds flag for export function. It will be not exported if False.
-    Key "is_presented" in initial lib (boolean)
+    - options (dict): Additional parameters for gen_func. "combination" is
+      a reserved key.
 
-    requirements: holds possible modes of another fields. Key "requirements" in initial lib (dictionary)
+    - is_presented (bool): Flag indicating if the case should be exported.
+      If False, the case is excluded from exports.
 
-    type: Generator will choose that case like main case when you will run test of that type.
-    Key "type" in initial lib (string)
+    - requirements (dict): Permissible modes for related fields. Ensures
+      valid combinations during testing.
 
+    - type (str): Primary category or type of test this case pertains to.
+
+    - additional_fields (dict): Additional attributes or properties associated
+      with the case.This provides flexibility for extending the functionality
+      or storing extra metadata related to the case.
+
+    Notes:
+    Attributes and roles are based on the initial library's design.
     """
 
     def __init__(self, case: dict, field_name: str, field_mode: str):

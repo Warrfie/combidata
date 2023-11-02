@@ -15,23 +15,21 @@ def step_not_done(current_step_name, combi):
 
 class Combination:
     """
-    test_seed: formed in ST_COMBINE process
+    Represents a combination of test data and associated processes.
 
-    formed_data: formed in ST_FORM process
+    Attributes:
 
-
-    step_done: last passed step
-
-    init_lib: copy of init lib
-
-    main_case: store for main case instance
-    template: holds export template (dict)
-    tools: holds dictionary with items which can be used in processes (dict)
-    generated_data: holds all data generated in ST_GENERATE step
-    other_cases: holds other cases that take part in test
-    cache: some store for your steps and processes
-    workflow: holds list or tuple with processes
-
+    - test_seed (dict, optional): Formed during the ST_COMBINE process.
+    - formed_data (dict, optional): Formed during the ST_FORM process.
+    - step_done (str): The last successfully passed step.
+    - init_lib (dict): A copy of the initial library.
+    - main_case (Case): Storage for the main case instance.
+    - template (dict): Holds the export template (supports JSON format).
+    - tools (dict): Contains items that can be used in processes.
+    - generated_data (dict): Contains all data generated during the ST_GENERATE step.
+    - other_cases (dict): Stores other cases that participate in the test.
+    - cache (dict): A storage for steps and processes, can store any data.
+    - workflow (list or tuple): Contains a sequence of processes, can be a list of tuples or a tuple.
     """
     test_seed = None
     formed_data = None
