@@ -3,7 +3,9 @@
 [![PyPi status](https://img.shields.io/pypi/status/combidata.svg?style=flat-square)](https://pypi.python.org/pypi/combidata)
 
 # Combidata
-
+<p align="center">
+  <img src="docs/assets/logo.svg" alt="Combidata Logo" width="200" height="200"/>
+</p>
 Combidata is a case-oriented library designed for compositional testing of combinatorics in IT product functionalities.
 
 ## Installation

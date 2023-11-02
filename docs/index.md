@@ -17,14 +17,7 @@ Welcome to the Combidata documentation! Combidata is a case-oriented library des
 
 ---
 
-## Installation
 
-
-```
-pip install combidata
-```
-
----
 
 ### Table of Contents
 
