@@ -9,6 +9,8 @@ from combidata.classes.combination import Combination
 from combidata import ST_COMBINE, ST_GENERATE, ST_FORM, DataGenerator, Process
 from re_generate import re_generate
 
+from combidata.funcs.exeptions import CombinatoricsError
+
 
 def code_generator(combination, example_token):
     # just for test
@@ -17,6 +19,7 @@ def code_generator(combination, example_token):
 
 def gen_comb(combination: Combination):
     new_comb = DataGenerator(library, amount=1).get_one()
+
     new_comb.run()
     return new_comb.generated_data
 
@@ -36,7 +39,9 @@ library = {
     "template": {
         "NAME": "NAME",
         "code": "CODE",
-        "inc": "SAVES"
+        "inc": "SAVES",
+        "obj1": "OBJ1",
+        "obj2": "OBJ2",
     }
 }
 library["cases"]["NAME"] = {
@@ -55,6 +60,40 @@ library["cases"]["NAME"] = {
         "requirements": {"CODE": "T"},
         "is_presented": False,
         "name": "Check NAME for not necessary field"
+    }}
+library["cases"]["OBJ1"] = {
+    "1": {
+        "gen_func": re_generate,
+        "value": r"[a-zA-Z]{50}",
+        "requirements": {"CODE": "NT"},
+        "name": "1Standart NAME check"
+    },
+    "2": {
+        "value": "12345",
+        "requirements": {"CODE": "NT"},
+        "name": "1Check NAME with error"
+    },
+    "3": {
+        "value": None,
+        "requirements": {"OBJ2": ["1", "2"]},
+        "is_presented": False,
+        "name": "1Check NAME for not necessary field"
+    }}
+library["cases"]["OBJ2"] = {
+    "1": {
+        "gen_func": re_generate,
+        "value": r"[a-zA-Z]{50}",
+        "name": "2Standart NAME check"
+    },
+    "2": {
+        "value": "12345",
+        "name": "2Check NAME with error"
+    },
+    "3": {
+        "value": None,
+        "requirements": {"CODE": "T"},
+        "is_presented": False,
+        "name": "2Check NAME for not necessary field"
     }}
 library["cases"]["CODE"] = {
     "TNNN": {
@@ -100,8 +139,37 @@ library["cases"]["SAVES"] = {
     },
 }
 
-generator = DataGenerator(library, amount=100)
+generator = DataGenerator(library)
+
+
 generator.run()
+
+
+@pytest.mark.parametrize("combination_name", generator.combinations.keys())
+def test_smoke(combination_name):
+    combination = generator.combinations[combination_name]
+    combination.run()
+    if isinstance(combination.step_done, Exception):
+        raise combination.step_done
+    print()
+    print(combination.test_seed)
+    print()
+    pprint(combination.formed_data)
+
+
+@pytest.mark.parametrize("combination_name", generator.combinations.keys())
+def test_smoke(combination_name):
+    combination = generator.combinations[combination_name]
+    combination.run()
+    if isinstance(combination.step_done, CombinatoricsError):
+        pytest.skip()
+    elif isinstance(combination.step_done, Exception):
+        raise combination.step_done
+    print()
+    print(combination.test_seed)
+    print()
+    pprint(combination.formed_data)
+    assert combination.test_seed.get("OBJ2", True) != "3"
 
 
 @pytest.mark.parametrize("combination_name", generator.combinations.keys())
@@ -125,6 +193,7 @@ def test2(combination_name):
     gen_seed = gen_seed.test_seed
     assert seed == gen_seed
 
+
 @pytest.mark.parametrize("combination_name", generator.combinations.keys())
 def test3(combination_name):
     combination = generator.combinations[combination_name]
@@ -134,4 +203,3 @@ def test3(combination_name):
     print(seed)
     semi_gen = DataGenerator(library, possible_modes=seed, amount=100)
     semi_gen.run()
-

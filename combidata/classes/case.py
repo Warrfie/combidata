@@ -60,7 +60,8 @@ class Case:
 
         self.additional_fields = self.form_additional_fields(case)
 
-
+    def __repr__(self):
+        return str(vars(self))
 
     def hand_requirements(self, requirements):
         if isinstance(requirements, dict):

@@ -2,14 +2,24 @@ import copy
 import traceback
 
 
-def step_not_done(current_step_name, combi):
-    if isinstance(combi, list):
-        for combination in combi:
-            if combination.step_done != current_step_name and combination.step_done != "STOP":
-                return True
+def current_workflow(workflow, is_all_steps=False):
+    from combidata import Process
+    if isinstance(workflow[0], Process):
+        for process in workflow:
+            yield process
+    elif is_all_steps:
+        for stage in workflow:
+            for process in stage:
+                yield process
     else:
-        if combi.step_done != current_step_name and combi.step_done != "STOP":
-            return True
+        for process in workflow[0]:
+            yield process
+        workflow.pop(0)
+
+
+def step_not_done(current_step_name, combi):
+    if combi.step_done != current_step_name and not isinstance(combi.step_done, Exception):
+        return True
     return False
 
 
@@ -36,7 +46,7 @@ class Combination:
 
     step_done = None  # last passed step
 
-    def __init__(self, case, workflow, init_lib, template, tools, logger, generator_id):
+    def __init__(self, case, workflow, init_lib, template, tools, logger, generator_id, types_for_generation):
         self.init_lib = copy.deepcopy(init_lib)
         self.main_case = case
         self.template = template
@@ -49,14 +59,12 @@ class Combination:
 
         self.cache = {}
 
-        self.workflow = workflow
+        self.workflow = copy.deepcopy(workflow)
 
-        self.init_lib[self.main_case.field_name] = {self.main_case.field_mode: self.main_case}
+        self.types_for_generation = types_for_generation
 
     def run(self):
-        self.workflow = list(self.workflow) if isinstance(self.workflow, list) else self.workflow  # todo beautify
-        workflow = self.workflow.pop(0) if isinstance(self.workflow, list) else self.workflow
-        for current_step in workflow:
+        for current_step in current_workflow(self.workflow):
             while step_not_done(current_step.name, self):
                 if self.step_done != current_step.name:
                     if self.logger:
@@ -64,7 +72,7 @@ class Combination:
                     try:
                         current_step.activate(self)
                     except Exception as e:
-                        self.step_done = "STOP"
+                        self.step_done = e
                         if self.logger:
                             temp_exep = f"An exception occurred: {type(e).__name__}. "
                             temp_exep += f"Error message: {str(e)}. "
@@ -75,9 +83,6 @@ class Combination:
                                 line_number = last_traceback.lineno
                                 temp_exep += f"Occurred at: {file_name}:{line_number}. "
                             self.logger.end_step(self.generator_id, temp_exep)
-                        else:
-                            raise e
                     else:
                         if self.logger:
                             self.logger.end_step(self.generator_id)
-

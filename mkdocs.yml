@@ -10,6 +10,7 @@ nav:
     - Combination: Combination.md
     - DataGenerator: DataGenerator.md
   - Quick Start Guide: QSG.md
+  - Release Notes: ReleaseNotes.md
 theme:
   name: material
   logo: assets/logo.svg
