@@ -10,7 +10,7 @@ setup(
     version="0.2.3",
     description="Package for random data generation and combination different cases",
     long_description=long_description,
-    url="https://github.com/Warrfie/combidata",
+    url="warrfie.github.io/combidata",
     author="Kuklikov Maxim (Warrfie)",
     author_email="warrfie@gmail.com",
     classifiers=[

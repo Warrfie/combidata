@@ -38,7 +38,7 @@ Combidata provides a comprehensive solution for compositional testing, allowing 
 
 ## Getting Started
 
-To get started with Combidata, visit our [Quick Start Guide](https://warrfie.github.io/combidata/QSG.md) which provides step-by-step instructions on setting up and using the library.
+To get started with Combidata, visit our [Quick Start Guide](https://warrfie.github.io/combidata/QSG) which provides step-by-step instructions on setting up and using the library.
 
 ## Support
 If you need help with Combidata or have any questions, please open an issue on GitHub or contact the maintainers directly 
