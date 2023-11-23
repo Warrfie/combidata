@@ -3,7 +3,7 @@ hide:
   - navigation
 ---
 
-# Release Notes: Version 0.2.3
+# Release Notes: Version 0.2.4
 
 ## Enhancements:
 1. **Multidimensional Graph Overhaul:** The multidimensional graph has been reworked for improved performance and efficiency.
