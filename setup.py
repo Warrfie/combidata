@@ -9,8 +9,8 @@ setup(
     name="combidata",
     version="0.2.3",
     description="Package for random data generation and combination different cases",
-    long_description=long_description,
-    url="warrfie.github.io/combidata",
+    long_description=open('README.md').read(),
+    url="https://warrfie.github.io/combidata",
     author="Kuklikov Maxim (Warrfie)",
     author_email="warrfie@gmail.com",
     classifiers=[
@@ -27,5 +27,7 @@ setup(
         "Telegram": "https://t.me/sasisochka",
         "Main page": "https://github.com/Warrfie/combidata"
     },
+
+    long_description_content_type='text/markdown'
 )
 
