@@ -49,10 +49,10 @@ class MDG:
                                 if self.logger:
                                     self.logger.add_log(self.generator_id,
                                                         f"Mode: {mode} in field: {field}: Was deleted because will never use in generation")
-                            modes_for_hunt = set(template[req_unit].keys()) - req_modes
+                            modes_for_hunt = set(template[req_unit].keys()) - template[field][mode].requirements[req_unit]
                             for target_mode in modes_for_hunt:
                                 template[req_unit][target_mode].requirements[field] = \
-                                    template[req_unit][target_mode].requirements[field] - set(mode)
+                                    template[req_unit][target_mode].requirements[field] - {mode}
                                 if not template[req_unit][target_mode].requirements[field]:
                                     del template[req_unit][target_mode]
                                     if self.logger:

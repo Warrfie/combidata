@@ -3,6 +3,11 @@ hide:
   - navigation
 ---
 
+# Release Notes: Version 0.2.5
+
+## Bug Fixes:
+1. **Multidimensional Graph Bugs Fixed:** I've ironed out the bugs in the multidimensional graph, ensuring smoother and more reliable performance.
+
 # Release Notes: Version 0.2.4
 
 ## Enhancements:
