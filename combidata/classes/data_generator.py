@@ -90,11 +90,15 @@ Note:
 
         workflow = copy.deepcopy(self.workflow)
         if "ST_COMBINE" in [process.name for process in current_workflow(workflow, True)]:
-            combi_graph = MDG(self.init_lib, self.types_for_generation)
+            combi_graph = MDG(self.init_lib, self.types_for_generation) #todo add logger
             combinations = list(self.combinations.keys())
             random.shuffle(combinations)
             for combination_name in combinations:
-                if not combi_graph.can_combine(self.combinations[combination_name].main_case):
+                main_case = self.combinations[combination_name].main_case
+                if main_case.field_name in combi_graph.neutral_lib.keys() and main_case.field_mode in combi_graph.neutral_lib[main_case.field_name].keys():
+                    if not combi_graph.can_combine(main_case):
+                        del self.combinations[combination_name]
+                else:
                     del self.combinations[combination_name]
 
         dict_keys = list(self.combinations.keys())

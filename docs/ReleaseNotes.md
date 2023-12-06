@@ -3,6 +3,14 @@ hide:
   - navigation
 ---
 
+# Release Notes: Version 0.2.6
+
+## Bug Fixes:
+1. **Main Cases Bugs Fixed:** Small fix for impossible main cases, now they ignored.
+
+
+
+
 # Release Notes: Version 0.2.5
 
 ## Bug Fixes:

@@ -21,6 +21,8 @@ def form_template(lib):
 
 def can_combine(neutral_lib, current_case, types_for_generation):
     case = copy.deepcopy(current_case)
+    if case.field_name not in neutral_lib.keys() or not neutral_lib[case.field_name].get(case.field_mode, False):
+        return False
     case.requirements = neutral_lib[case.field_name][case.field_mode].requirements
     copied_lib = copy.deepcopy(neutral_lib)
 

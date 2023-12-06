@@ -7,7 +7,7 @@ long_description = (here / "README.md").read_text(encoding="utf-8")
 
 setup(
     name="combidata",
-    version="0.2.5",
+    version="0.2.6",
     description="Package for random data generation and combination different cases",
     long_description=open('README.md').read(),
     url="https://warrfie.github.io/combidata",
