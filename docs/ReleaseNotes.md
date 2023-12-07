@@ -3,6 +3,12 @@ hide:
   - navigation
 ---
 
+
+# Release Notes: Version 0.2.7
+
+## Optimization:
+1. **Case Amount Optimization:** Now it will be faster.
+
 # Release Notes: Version 0.2.6
 
 ## Bug Fixes:

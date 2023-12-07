@@ -1,6 +1,6 @@
 import copy
 import random
-
+from combidata.classes.combination import current_workflow
 
 def should_keep(x):
     return len(x) > 1
@@ -59,3 +59,49 @@ def can_combine(neutral_lib, current_case, types_for_generation):
                 return result
         else:
             return False
+
+
+def unlimited_cases(init_lib, cases_lib, workflow, types_for_generation):
+    correct_cases = {}
+    is_full = False
+    current_keys_list = []
+    counter = 0
+
+    workflow = copy.deepcopy(workflow)
+    must_prove = "ST_COMBINE" in [process.name for process in current_workflow(workflow, True)]
+
+    if not must_prove:
+        correct_cases = copy.deepcopy(cases_lib)
+        is_full = True
+        current_keys_list = list(correct_cases.keys())
+        random.shuffle(current_keys_list)
+
+    while True:
+        if is_full:
+            if current_keys_list:
+                combination_name = current_keys_list.pop()
+                if counter == 0:
+                    yield {combination_name: cases_lib[combination_name]}
+                else:
+                    yield {f"{combination_name} [{counter}]": cases_lib[combination_name]}
+            else:
+                current_keys_list = list(correct_cases.keys())
+                random.shuffle(current_keys_list)
+                counter += 1
+                combination_name = current_keys_list.pop()
+                yield {f"{combination_name} [{counter}]": cases_lib[combination_name]}
+        else:
+            from combidata.classes.mul_dim_graph import MDG
+            combi_graph = MDG(init_lib, types_for_generation)  # todo add logger
+            combinations = list(cases_lib.keys())
+            random.shuffle(combinations)
+            for combination_name in combinations:
+                main_case = cases_lib[combination_name].main_case
+                if main_case.field_name in combi_graph.neutral_lib.keys() and main_case.field_mode in \
+                        combi_graph.neutral_lib[main_case.field_name].keys() and combi_graph.can_combine(main_case):
+                    correct_cases.update({combination_name: main_case})
+                    yield {combination_name: cases_lib[combination_name]}
+                is_full = True
+                current_keys_list = list(correct_cases.keys())
+                random.shuffle(current_keys_list)
+                counter += 1

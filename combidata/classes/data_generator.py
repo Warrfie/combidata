@@ -5,6 +5,7 @@ from combidata.classes.case import Case
 from combidata.classes.combination import Combination, current_workflow
 from combidata.classes.mul_dim_graph import MDG
 from combidata.funcs.exeptions import CombinatoricsError
+from combidata.funcs.form_and_combine import unlimited_cases
 
 
 def check_all_names(init_lib):
@@ -83,53 +84,18 @@ Note:
 
         assert self.combinations, "No combinations for tests"  # TODO deep logging needed
 
-        if amount is not None:
+        if amount:
             self.extend_cases(amount)
 
     def extend_cases(self, amount):
-
-        workflow = copy.deepcopy(self.workflow)
-        if "ST_COMBINE" in [process.name for process in current_workflow(workflow, True)]:
-            combi_graph = MDG(self.init_lib, self.types_for_generation) #todo add logger
-            combinations = list(self.combinations.keys())
-            random.shuffle(combinations)
-            for combination_name in combinations:
-                main_case = self.combinations[combination_name].main_case
-                if main_case.field_name in combi_graph.neutral_lib.keys() and main_case.field_mode in combi_graph.neutral_lib[main_case.field_name].keys():
-                    if not combi_graph.can_combine(main_case):
-                        del self.combinations[combination_name]
-                else:
-                    del self.combinations[combination_name]
-
-        dict_keys = list(self.combinations.keys())
-        random.shuffle(dict_keys)
-        key_count = len(dict_keys)
-
-        if key_count == amount:
-            return
-        elif key_count > amount:
-            for i in range(key_count - amount):
-                del self.combinations[dict_keys[i]]
-            return
-
-        i = 0
-        added_key_count = 0
-        shuffle_point = (amount // key_count) * key_count
-
-        while added_key_count < amount:
-            if i % key_count == 0 and i == shuffle_point:
-                random.shuffle(dict_keys)
-            key = dict_keys[i % key_count]
-            value = self.combinations[key]
-
-            if i < key_count:
-                self.combinations[key] = copy.deepcopy(value)
+        temp = {}
+        for test_case in unlimited_cases(self.init_lib, self.combinations, self.workflow, self.types_for_generation):
+            if amount != 0:
+                temp.update(test_case)
+                amount -= 1
             else:
-                extended_key = f"{key}[{i // key_count}]"
-                self.combinations[extended_key] = copy.deepcopy(value)
-
-            i += 1
-            added_key_count += 1
+                self.combinations = temp
+                return
 
     def form_combinations(self):
         self.combinations = {}
@@ -146,7 +112,7 @@ Note:
         for combination_name in combinations_names:
             self.combinations[combination_name].run()
             if isinstance(self.combinations[combination_name].step_done, type(CombinatoricsError())):
-                del self.combinations[combination_name]
+                del self.combinations[combination_name] #todo logs!
 
     def run_one(self):
         combinations = list(self.combinations.keys())
@@ -157,17 +123,8 @@ Note:
                 return combinations[combination_name]
 
     def get_one(self):
-        workflow = copy.deepcopy(self.workflow)
-        if "ST_COMBINE" in [process.name for process in current_workflow(workflow, True)]:
-            combi_graph = MDG(self.init_lib, self.types_for_generation)
-            combinations = list(self.combinations.keys())
-            random.shuffle(combinations)
-            for combination in combinations:
-                if combi_graph.can_combine(self.combinations[combination].main_case):
-                    return self.combinations[combination]
-        else:
-            combinations = list(self.combinations.keys())
-            return self.combinations[random.choice(combinations)]
+        for test_case in unlimited_cases(self.init_lib, self.combinations, self.workflow, self.types_for_generation):
+            return test_case[list(test_case.keys())[0]] #todo ugly
 
     # todo def any_passed
     @staticmethod
