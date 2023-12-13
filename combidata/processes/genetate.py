@@ -46,7 +46,7 @@ def generate(combination: Combination):
         generate_value(all_fields, case, combination)
 
     if combination.logger:
-        combination.logger.add_log(combination.generated_data,
-                                   f"Generated data: {str(combination.test_seed)}")
+        combination.logger.add_log(combination.generator_id,
+                                   f"Generated data: {str(combination.generated_data)}")
 
     return True

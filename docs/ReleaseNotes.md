@@ -3,6 +3,11 @@ hide:
   - navigation
 ---
 
+# Release Notes: Version 0.2.9
+
+## Bug Fixes:
+1. **Logging bug:** Small logging bug fixed
+
 # Release Notes: Version 0.2.8
 
 ## Enhancements:
