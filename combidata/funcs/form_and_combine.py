@@ -54,7 +54,9 @@ def can_combine(neutral_lib, current_case, types_for_generation):
         fields = [list(mode.values()) for mode in copied_lib.values()]
         random.shuffle(fields)
         fields = list(filter(should_keep, fields))
-        for case in fields[0]:
+        cases = fields[0]
+        random.shuffle(cases)
+        for case in cases:
             if case.type_of_case in types_for_generation and (result := can_combine(copied_lib, case, types_for_generation)):
                 return result
         else:

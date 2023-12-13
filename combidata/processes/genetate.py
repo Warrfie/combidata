@@ -45,4 +45,8 @@ def generate(combination: Combination):
         case = random.choice(all_fields)
         generate_value(all_fields, case, combination)
 
+    if combination.logger:
+        combination.logger.add_log(combination.generated_data,
+                                   f"Generated data: {str(combination.test_seed)}")
+
     return True

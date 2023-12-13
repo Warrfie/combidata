@@ -14,4 +14,8 @@ def find_replace_in_dict(template, generated_data, keys):
 def form(combination):
     combination.formed_data = find_replace_in_dict(combination.template, combination.generated_data, combination.init_lib.keys())
 
+    if combination.logger:
+        combination.logger.add_log(combination.generator_id,
+                                   f"Formed data: {str(combination.formed_data)}")
+
     return True

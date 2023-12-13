@@ -10,10 +10,34 @@ from combidata.funcs.form_and_combine import unlimited_cases
 
 def check_all_names(init_lib):
     name_set = set()
-    for cases in init_lib["cases"].values():
-        for case in cases.values():
-            assert case["name"] not in name_set, case["name"] + " - is not unique"
+    not_unic_items = ""
+    for field_name, cases in init_lib["cases"].items():
+        for case_code, case in cases.items():
+            if case["name"] in name_set:
+                not_unic_items += f"Case [{case_code}] for [{field_name}] have not unique name: {case['name']}\n"
             name_set.add(case["name"])
+
+    if not_unic_items:
+        raise ValueError(not_unic_items)
+
+
+def check_input_data(amount, banned_fields, possible_fields, library, logger, generator_id):
+    if not (amount is None or (isinstance(amount, int) and amount > 0)):
+        raise ValueError("Amount must be an integer greater than 0")
+
+    if not (banned_fields is None or isinstance(banned_fields, list)):
+        raise TypeError("Banned_fields must be a list instance")
+
+    if not (possible_fields is None or isinstance(possible_fields, list)):
+        raise TypeError("Possible_fields must be a list instance")
+
+    if banned_fields is not None and possible_fields is not None:
+        raise ValueError("You can't use banned_fields and possible_fields arguments simultaneously")
+
+    if not ((logger and generator_id) or logger is None):
+        raise ValueError("You must use both logger and generator_id, or neither")
+
+    check_all_names(library)
 
 
 class DataGenerator:
@@ -55,11 +79,8 @@ Note:
                  generator_id: str = None):
 
         self.combinations = None
-        assert amount is None or (isinstance(amount, int) and amount > 0), "amount must be integer > 0"
-        assert banned_fields is None or isinstance(banned_fields, list), "banned_fields must be list instance"
-        assert possible_fields is None or isinstance(possible_fields, list), "possible_fields must be list instance"
-        assert banned_fields is None or possible_fields is None, "You can't use banned_fields and possible_fields arguments simultaneously"
-        check_all_names(library)
+
+        check_input_data(amount, banned_fields, possible_fields, library, logger, generator_id)
 
         self.modes_for_gen = self.form_modes_for_gen(possible_modes)
         self.init_lib = self.form_init_lib(library)
@@ -68,8 +89,6 @@ Note:
         self.tools = library.get("tools")
         self.logger = logger
         self.generator_id = generator_id
-
-        assert (logger and generator_id) or logger is None, "You must use logger and generator_id"
 
         self.type_of_cases = type_of_cases if type_of_cases else "standard"
         self.workflow = self.get_workflow(library["workflow"], type_of_cases)
@@ -112,7 +131,7 @@ Note:
         for combination_name in combinations_names:
             self.combinations[combination_name].run()
             if isinstance(self.combinations[combination_name].step_done, type(CombinatoricsError())):
-                del self.combinations[combination_name] #todo logs!
+                del self.combinations[combination_name]  # todo logs!
 
     def run_one(self):
         combinations = list(self.combinations.keys())
@@ -124,7 +143,7 @@ Note:
 
     def get_one(self):
         for test_case in unlimited_cases(self.init_lib, self.combinations, self.workflow, self.types_for_generation):
-            return test_case[list(test_case.keys())[0]] #todo ugly
+            return test_case[list(test_case.keys())[0]]  # todo ugly
 
     # todo def any_passed
     @staticmethod
@@ -165,4 +184,3 @@ Note:
                                                                            field not in possible_fields]
             for field in banned_fields:
                 del self.init_lib[field]
-

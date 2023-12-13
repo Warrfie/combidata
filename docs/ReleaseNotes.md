@@ -3,6 +3,14 @@ hide:
   - navigation
 ---
 
+# Release Notes: Version 0.2.8
+
+## Enhancements:
+1. **Enhanced Exception Clarity:** Error messages are now more understandable, and appropriate exceptions are raised. This improvement helps you identify launch issues and alerts you to any non-unique names.
+2. **Logging in Standard Steps:** All standard steps now feature logging, providing better insight and traceability during testing.
+
+## Bug Fixes:
+1. **Randomized Case Selection:** Combidata now randomly combines cases, enhancing the diversity and effectiveness of testing scenarios.
 
 # Release Notes: Version 0.2.7
 
